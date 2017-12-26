@@ -10,7 +10,7 @@ Make sure Python is installed.
 
 Clone this repository.
 
-```git clone ```
+```git clone https://github.com/jmcmahon443/nvidia-jetson-competition.git```
 
 Install `midiutil`.
 
