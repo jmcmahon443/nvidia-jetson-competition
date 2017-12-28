@@ -3,7 +3,7 @@ This is the software for the AI Bass Drum Pedal entry to the Nvidia Jetson embed
 
 ![AI Bass Drum Pedal Software Diagram](diagram.png?raw=true "Diagram")
 
-## Installation
+## Workstation installation
 Make sure Python is installed.
 
 ```which python```
@@ -12,8 +12,16 @@ Clone this repository.
 
 ```git clone https://github.com/jmcmahon443/nvidia-jetson-competition.git```
 
-Install `midiutil`.
+Install `midiutil` and `madmom`.
 
-```pip install midiutil```
+```sudo pip install midiutil madmom```
 
-TODO.
+## Jetson setup and installation
+1. Plug-in power, HDMI monitor, mouse and keyboard. Hit the power button.
+2. Follow Nvidia's installation steps shown at boot and reboot to Ubuntu desktop.
+3. Connect to Wi-Fi (Nvidia Jetson TK1 requires a Wi-Fi module).
+4. `sudo apt-get install vim`
+5. `INSTALL PIP`
+6. Follow the rest of the steps above to install the software.
+7. `EDIT DEFAULT STARTUP TO GO TO COMMAND LINE, USE STARTX FOR DESKTOP`
+8. `SET UP SSH`
