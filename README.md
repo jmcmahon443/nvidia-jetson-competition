@@ -2,6 +2,7 @@
 This is the software for the AI Bass Drum Pedal entry to the Nvidia Jetson embedded AI competition. Below is the basic software stack diagram.
 
 ![AI Bass Drum Pedal Software Diagram](diagram.png?raw=true "Diagram")
+`TODO`: Update this diagram on 1/7/2018.
 
 ## Workstation installation
 1. Make sure Python is installed: `which python`.
