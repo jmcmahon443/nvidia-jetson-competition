@@ -8,7 +8,7 @@ project(beat_detector)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  madmom
+#  madmom
   rospy
 )
 
