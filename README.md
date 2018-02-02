@@ -6,14 +6,15 @@ This is the software for the AI Bass Drum Pedal entry to the Nvidia Jetson embed
 
 ## Workstation installation
 1. Make sure Python is installed: `which python`.
-2. Install `midiutil` and `madmom`: `sudo pip install vim cython numpy scipy midiutil madmom`.
+2. Install `vim`: `sudo apt install vim`.
+3. Install `midiutil` and `madmom`: `sudo pip install vim cython numpy scipy midiutil madmom`.
 
 ## Jetson setup and installation
 1. Plug-in power, HDMI monitor, mouse and keyboard into Jetson. Hit the power button.
 2. Follow Nvidia's installation steps shown at boot and reboot to Ubuntu desktop.
 3. Connect to Wi-Fi (Sarmad's TK1 requires a Wi-Fi module and driver), or ethernet to router.
 4. Follow the steps above in "Workstation installation" to install the software.
-5. `DBNBeatTracker single -o test.txt ../music/audio/DickInABox.mp3`
+5. `DBNBeatTracker single -o test.txt ../music/audio/DickInABox.mp3`.
 
 ## `ssh` setup
 1. Once Wi-Fi is setup on the Jetson, open a Terminal and type `ifconfig`.
