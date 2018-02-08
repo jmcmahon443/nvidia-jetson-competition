@@ -2,6 +2,7 @@
 
 from __future__ import division
 import pygame.midi as midi
+import pygame
 import time
 from playsound import playsound
 import rospy
@@ -10,11 +11,15 @@ import csv
 
 
 class Player(object):
-	note='../res/kick.mp3'
+	kick='res/kick.mp3'
+ 
+    
 
 	rate=10
 	def __init__(self):
-		
+		#pygame.init()
+		#self.s = pygame.mixer.Sound(Player.kick)
+    	
 		rospy.init_node('beat_player_node', anonymous=True)
 		self.mode = rospy.get_param('~player_mode', 'playback')
 		
@@ -27,12 +32,11 @@ class Player(object):
 			self.run=self.playback
 			
 			
-	def play(self,data):
+	def play(self):
 		#playsound(self.note) # this has dep issues
 		print('beep') #for now, let's find a sound module. 
-	
+		#self.s.play()
 	def loadfile(self):
-			raise NotImplemented #convert read string to floats
 		try:
 			path=input('Beat file:')
 			
@@ -54,7 +58,7 @@ class Player(object):
 		mark = rospy.Time.now()			
 		while i < len(beats):
 			elapsed=rospy.Time.now() - mark
-			if abs(elapsed-beats[i]) < T: #if we are in the correct t with a resolution of 1/rate	
+			if abs(elapsed.to_sec()-float(beats[i])) < T: #if we are in the correct t with a resolution of 1/rate	
 				self.play()
 				i+=1
 							
