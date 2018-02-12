@@ -6,8 +6,11 @@ This is the software for the AI Bass Drum Pedal entry to the Nvidia Jetson embed
 
 ## Workstation installation
 1. Make sure Python is installed: `which python`.
-2. Install DPKG packages `sudo apt install vim ffmpeg`.
-3. Install PIP packages: `sudo pip install cython numpy scipy midiutil madmom`.
+2. Install DPKG packages `sudo apt-get install vim ffmpeg python-portaudio aubio`.
+  .Optionally you can get aubio from https://git.aubio.org/aubio/aubio/
+  *Jack2d is recommended*
+3. Install PIP packages: `sudo pip install cython numpy scipy midiutil madmom pyaudio pysoundcard aubio`.
+
 
 ## Jetson setup and installation
 1. Plug-in power, HDMI monitor, mouse and keyboard into Jetson. Hit the power button.
