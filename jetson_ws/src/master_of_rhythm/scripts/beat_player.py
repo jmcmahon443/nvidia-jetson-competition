@@ -10,34 +10,54 @@ from beat_msgs.msg import Beat
 import csv
 
 
+
+
+
+def predict(self, next_n):
+	presum=0
+	I=0
+	e=0
+	e_sum=0
+	print(0, "	",beats[0], "  ", "-", "  ", "-")
+	for i in range(1,len(beats)-1): #care elemnt number vs index
+		I+=i
+		presum+=normalized[i-1]
+		next=(presum/I)*(i+1)+beats[0]
+		adjusted_next=((presum-e_sum)/(I+e))*(i+1)
+		e=adjusted_next-beats[i]
+		e_sum+=e
+
+
 class Player(object):
-	kick='res/kick.mp3'
+	KICK='res/kick.mp3'
+	NODE_RATE=20
 
-
-
-	rate=10
 	def __init__(self):
 		#pygame.init()
 		#self.s = pygame.mixer.Sound(Player.kick)
-		self.beats=[]
+		self.beats=[0]
+		self.predicted=[] #add the actuator delay here, subtract it for comparison
 		rospy.init_node('beat_player_node', anonymous=True)
 		self.mode = rospy.get_param('~player_mode', 'live')
 
-		self.r = rospy.Rate(self.rate) # 10 Hz
+		self.rate = rospy.Rate(Player.NODE_RATE) # 10 Hz
 
 		if self.mode is not 'playback':
 			print("Player is live")
-			self.beat_sub = rospy.Subscriber('beats', Beat, self.play)
+			self.beat_sub = rospy.Subscriber('beats', Beat, self.beat_cb)
 			#self.run=self.live
 		else:
 			print("Playing form file")
 			beatfile=self.loadfile()
 			beats=[float(tstamp) for tstamp in beatfile.readlines()]
 
-	def play(self,data):
+	def beat_cb(self,data):
 		#playsound(self.note) # this has dep issues
-		print('beep') #for now, let's find a sound module.
-		self.beats.append(data.header.stamp)
+		t_stmp=data.header.stamp.to_sec()
+		print('beep', t_stmp-self.beats[-1] ) #for now, let's find a sound module.
+		self.beats.append(t_stmp)
+	def play(self):
+		pass
 		#self.s.play()
 	def loadfile(self):
 		try:
@@ -51,7 +71,7 @@ class Player(object):
 
 	def run(self):
 
-		T=1/self.rate #1/f, Period
+		T=1/Player.NODE_RATE #1/f, Period
 		i=0
 		# for multicloumn
 		# csv.reader(beats)
@@ -60,14 +80,12 @@ class Player(object):
 			mark = rospy.Time.now()
 			if i < len(self.beats):
 				elapsed=rospy.Time.now() - mark
-				if abs(elapsed.to_sec()-self.beats[i].to_sec()) < T: #if we are in the correct t with a resolution of 1/rate
+				if abs(elapsed.to_sec()-self.beats[i]) < T: #if we are in the correct t with a resolution of 1/rate
 					self.play()
 					i+=1
 			else:
 				pass
-			self.r.sleep()
-
-
+			self.rate.sleep()
 
 
 if __name__ == '__main__':
