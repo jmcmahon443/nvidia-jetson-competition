@@ -38,6 +38,8 @@ class BeatMaker(object):
             print("Tapping to the live input")
             self.mode=BeatMaker.LIVE
             samplerate=RATE
+            self.btempo = aubio.tempo("default", win_s, hop_s, samplerate)
+
             self.stream = self.audio.open(format=self.audio_format, channels=n_channels, rate=samplerate,
                     input=True, frames_per_buffer=self.fpb,
                     stream_callback=self.mic_callback)
@@ -47,13 +49,14 @@ class BeatMaker(object):
             self.mode=BeatMaker.OFFLINE
             self.source = aubio.source(filename, samplerate, hop_s)
             samplerate = self.source.samplerate
+            self.btempo = aubio.tempo("default", win_s, hop_s, samplerate)
+
             self.stream =  self.audio.open(format=self.audio_format, channels=n_channels, rate=samplerate,
                         output=True, frames_per_buffer=self.fpb,
                         stream_callback=self.file_callback)
             self.click = 0.7 * np.sin(2. * np.pi * np.arange(hop_s) / hop_s * samplerate / 3000.)
         # create aubio tempo detection
 
-        self.btempo = aubio.tempo("default", win_s, hop_s, samplerate)
         # create a simple click sound
 
 

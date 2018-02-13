@@ -26,11 +26,13 @@ class Player(object):
 		self.r = rospy.Rate(self.rate) # 10 Hz
 
 		if self.mode is not 'playback':
+			print("Player is live")
 			self.beat_sub = rospy.Subscriber('beats', Beat, self.play)
-			self.run=self.live
+			#self.run=self.live
 		else:
-			self.run=self.playback
-
+			print("Playing form file")
+			beatfile=self.loadfile()
+			beats=[float(tstamp) for tstamp in beatfile.readlines()]
 
 	def play(self,data):
 		#playsound(self.note) # this has dep issues
@@ -47,27 +49,26 @@ class Player(object):
 			path='txt/test.txt'
 		return open(path, 'rU')
 
-	def playback(self):
-		print("Playing form file")
+	def run(self):
 
 		T=1/self.rate #1/f, Period
-		beatfile=self.loadfile()
-		beats=beatfile.readlines()
+		i=0
 		# for multicloumn
 		# csv.reader(beats)
-		i=0
-		mark = rospy.Time.now()
-		while i < len(beats):
-			elapsed=rospy.Time.now() - mark
-			if abs(elapsed.to_sec()-float(beats[i])) < T: #if we are in the correct t with a resolution of 1/rate
-				self.play()
-				i+=1
 
-	def live(self):
-		print("Player is live")
 		while not rospy.is_shutdown():
-
+			mark = rospy.Time.now()
+			if i < len(self.beats):
+				elapsed=rospy.Time.now() - mark
+				if abs(elapsed.to_sec()-self.beats[i].to_sec()) < T: #if we are in the correct t with a resolution of 1/rate
+					self.play()
+					i+=1
+			else:
+				pass
 			self.r.sleep()
+
+
+
 
 if __name__ == '__main__':
     try:
