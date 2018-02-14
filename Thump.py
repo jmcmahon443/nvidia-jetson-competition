@@ -22,19 +22,7 @@ myStepper = mh.getStepper(200, 2) # 200 steps/rev, motor port #1
 
 while (True):
     print("Thump")
-
-    #myStepper.setSpeed(6000)
-    #myStepper.step(50, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.SINGLE)
-    #myStepper.setSpeed(100)
-    #myStepper.step(50, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.SINGLE)
     myStepper.setSpeed(254)
     myStepper.step(18, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.DOUBLE)
     myStepper.setSpeed(50)
     myStepper.step(18, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.DOUBLE)
-    #myStepper.setSpeed(3000)
-    #myStepper.step(50, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.INTERLEAVE)
-    #myStepper.setSpeed(100)
-    #myStepper.step(50, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.INTERLEAVE)
-
-    #print("Sleep 0.2 seconnds")
-    #time.sleep(0.2)
