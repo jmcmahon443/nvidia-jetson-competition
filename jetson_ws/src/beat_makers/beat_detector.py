@@ -17,10 +17,13 @@ class BeatMaker(object):
     rate=10
     def __init__(self):
         #ros
-        rospy.init_node('beat_detector_node', anonymous=True)
+        rospy.init_node('beat_detector_node', log_level=rospy.INFO, anonymous=True)
         self.mode = rospy.get_param('~source', 'live')
         self.r = rospy.Rate(self.rate) # 10 Hz
         self.beat_pub = rospy.Publisher('beats', Beat, queue_size=10)
+        # and use the implemented Models array here
+
+
 
     def audio_init(self, filename, samplerate, win_s, hop_s):
         #pyaudio init.
@@ -104,24 +107,28 @@ class BeatMaker(object):
 
 def parse():
 
+
     if len(sys.argv) < 2:
       return "live", 0
+
 
     filename = sys.argv[1]
     samplerate = 0
 
-    if len( sys.argv ) > 2: samplerate = int(sys.argv[2])
+    if len(sys.argv) > 2: samplerate = int(sys.argv[2])
+
     return filename, samplerate
 
 
 if __name__ == '__main__':
     try:
-        filename,sr=parse()
+
+        file_name, sample_rate = parse()
         win_s = 1024                # fft size
         hop_s = win_s // 2
 
         bmk = BeatMaker()
-        bmk.audio_init(filename, sr, win_s, hop_s)
+        bmk.audio_init(file_name, sample_rate, win_s, hop_s)
         bmk.run()
 
     except rospy.ROSInterruptException: pass
