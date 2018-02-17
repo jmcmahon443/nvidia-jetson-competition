@@ -1,32 +1,30 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>beat_makers</name>
+  <name>master_of_beats</name>
   <version>0.2.0</version>
-  <description>Create beats with audio input, file or keyboard press</description>
-
-<maintainer email="oakyildiz@wpi.edu">Ozan Akyildiz</maintainer>
+  <description>A MIDI player for playing received durm beats</description>
+  <maintainer email="oakyildiz@todo.todo">oakyildiz</maintainer>
 
 
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>MIT</license>
-
-  <!-- <url type="website">http://wiki.ros.org/beat_detector</url> -->
   <author email="oakyildiz@wpi.edu">Ozan Akyildiz</author>
+
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
-  <!-- <build_export_depend>madmom</build_export_depend> -->
   <build_export_depend>rospy</build_export_depend>
 
   <exec_depend>rospy</exec_depend>
-  <exec_depend>aubio</exec_depend>
+  <exec_depend>pygame</exec_depend>
   <exec_depend>python-numpy</exec_depend>
-  <exec_depend>python-pyaudio</exec_depend>
 
   <depend>beat_msgs</depend>
+  <depend>std_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
+    <!-- Other tools can request additional information be placed here -->
 
   </export>
 </package>

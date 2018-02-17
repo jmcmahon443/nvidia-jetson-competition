@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 
-from __future__ import division
-import pygame.midi as midi
-import pygame
-import time
-#from playsound import playsound
+import csv, sys, time
 import rospy
+import pygame #, ppygame.midi as midi
+#from playsound import playsound
 from std_msgs.msg import Bool
 from beat_msgs.msg import Beat
 
 from rhythm import Models
-import csv,sys
 
 
 class Player(object):
