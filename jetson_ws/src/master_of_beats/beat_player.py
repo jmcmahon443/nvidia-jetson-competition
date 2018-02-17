@@ -15,15 +15,15 @@ class Player(object):
     NODE_RATE=100
     LIVE=1
     OFF=0
-    
+
     def __init__(self,mode, predictive, lvl):
         #pygame.init()
         #self.s = pygame.mixer.Sound(Player.kick)
-       
+
         rospy.init_node('beat_player_node', log_level=lvl, anonymous=True)
         self.lag_adjustment=0.25 #for HW compensation
         self.ahead=2
-        
+
         if predictive:
             #offset with cur. time
             self.model=Models.RunningAvgFit(rospy.Time.now().to_sec())
@@ -62,7 +62,7 @@ class Player(object):
         t_stmp=data.header.stamp.to_sec() #for now, let's find a sound module.
         self.model.update(t_stmp)
         pred=self.model.predict(1)#self.ahead
-        
+
         rospy.logdebug("--------------------")
         rospy.logdebug("rcv.:   pred: ")
         rospy.logdebug(t_stmp)
@@ -119,15 +119,15 @@ class Player(object):
         while not rospy.is_shutdown():
             if i < len(self.model.predictions):
                 diff=rospy.Time.now().to_sec() - mark -self.model.predictions[i]
-
+                #print(diff)
                 #print('p:', self.model.predictions[i], 't:' , elapsed)
                 if abs(diff) < T: #if we are in the correct t with a resolution of 1/rate
                     #self.play()
                     # - self.lag_adjustment !
                     self.thump_pub.publish(True)
-                    rospy.logdebug("Fired with: ", diff, " s difference")
+                    #rospy.logdebug("Fired with: ", diff, " s difference")
                     i+=1
-                elif self.model.predictions[i] > T: #if running behind
+                elif diff > T: #if running behind
                     i+=1
 
 if __name__ == '__main__':
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         if len(sys.argv) > 3 and sys.argv[3]:
             lvl = rospy.DEBUG
         else: lvl = rospy.INFO
-        
+
         if len(sys.argv)>2:
             mode = sys.argv[1]
             pred = sys.argv[2]
