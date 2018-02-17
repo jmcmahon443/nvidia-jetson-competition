@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import division
 
 import time, sys
 import aubio, pyaudio
@@ -6,7 +7,7 @@ import rospy
 import numpy as np
 from beat_msgs.msg import Beat
 
-RATE = 44100
+RATE = 32000 #44100
 
 
 class BeatMaker(object):
@@ -14,12 +15,12 @@ class BeatMaker(object):
     OFFLINE=0
 
     source=[]
-    rate=10
-    def __init__(self):
+    rate=10 #calcualte by win_size/sampling rate: 512/44100 ~ 11.6ms
+    def __init__(self, lvl):
         #ros
-        rospy.init_node('beat_detector_node', log_level=rospy.INFO, anonymous=True)
+        rospy.init_node('beat_detector_node', log_level=lvl, anonymous=True)
         self.mode = rospy.get_param('~source', 'live')
-        self.r = rospy.Rate(self.rate) # 10 Hz
+
         self.beat_pub = rospy.Publisher('beats', Beat, queue_size=10)
         # and use the implemented Models array here
 
@@ -32,6 +33,8 @@ class BeatMaker(object):
         self.fpb = hop_s
         n_channels = 1
 
+        ## well, one line of ros logic here
+        self.r = rospy.Rate(RATE//win_s) # 50 Hz
         # initialize ros beat_msgs    self.msg=Beat()
         self.msg=Beat()
         self.msg.beat=True
@@ -59,7 +62,7 @@ class BeatMaker(object):
                         stream_callback=self.file_callback)
             self.click = 0.7 * np.sin(2. * np.pi * np.arange(hop_s) / hop_s * samplerate / 3000.)
         # create aubio tempo detection
-
+        
         # create a simple click sound
 
 
@@ -121,43 +124,19 @@ def parse():
 
 
 if __name__ == '__main__':
-    try:
-
+    try:    
+        if len(sys.argv) > 3 and sys.argv[3]:
+            lvl = rospy.DEBUG
+        else: lvl = rospy.INFO
+        
         file_name, sample_rate = parse()
         win_s = 1024                # fft size
         hop_s = win_s // 2
 
-        bmk = BeatMaker()
+        bmk = BeatMaker(lvl)
         bmk.audio_init(file_name, sample_rate, win_s, hop_s)
         bmk.run()
 
     except rospy.ROSInterruptException: pass
 
-# def record_sink(sink_path):
-#     """Record an audio file using pysoundcard."""
-#
-#     from aubio import sink
-#     from pysoundcard import Stream
-#
-#     hop_size = 256
-#     duration = 5 # in seconds
-#     s = Stream(blocksize = hop_size, channels = 1)
-#     g = sink(sink_path, samplerate = int(s.samplerate))
-#
-#     s.start()
-#     total_frames = 0
-#     try:
-#         while total_frames < duration * s.samplerate:
-#             vec = s.read(hop_size)
-#             # mix down to mono
-#             mono_vec = vec.sum(-1) / float(s.channels[0])
-#             g(mono_vec, hop_size)
-#             total_frames += hop_size
-#     except KeyboardInterrupt:
-#         duration = total_frames / float(s.samplerate)
-#         print("stopped after %.2f seconds" % duration)
-#     s.stop()
-#
-# if __name__ == '__main__':
-#     import sys
-#     record_sink(sys.argv[1])
+

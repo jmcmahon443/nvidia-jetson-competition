@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import numpy as np
 
 
@@ -13,7 +14,7 @@ class Models:
             self.steps = [] # intervals between beats
             self.predictions=[offset]
             self.erros=[] # observations(t) - predictions(t)
-
+            self.index=0
 
             self.offset=0
             self.bpm=60 # Not used
@@ -32,10 +33,11 @@ class Models:
         def predict(self,n):
             last=self.observations[-1]
             next_step=self.fit_fun(1)
-            rospy.logdebug("next_step: ", next_step)
-            rospy.logdebug("prev. steps: ", self.steps[-10:])
+            #print("next_step: ", next_step)
+            #print("prev. steps: ", self.steps[-10:])
             current_predictions = [(self.fit_fun(i) + last) for i in range(1,n+1)]
             self.predictions.extend(current_predictions)
+            #print(current_predictions)
             return current_predictions
 
         # when we want to update n predictions starting from after existing index i
@@ -66,11 +68,11 @@ class Models:
     
         def __init__(self,offset):
             # f=mx+p
-            super().__init__(offset)
+            super(AvgFit, self).__init__(offset)
             self.m=0
 
         def update(self,t_stmp):
-            super().update(t_stmp)
+            super(AvgFit, self).update(t_stmp)
             l=len(steps)
             #also ignore the first 0
             self.m = (self.m *(l-2)+ self.steps[-1])/(l-1) # should be faster than mean function
@@ -83,12 +85,12 @@ class Models:
     
         def __init__(self,offset):
             # f=mx+p
-            super().__init__(offset)
+            super(Models.RunningAvgFit, self).__init__(offset)
             self.m_n=0 #running average
             self.n=10 # window size for avg
             
         def update(self,t_stmp):
-            super().update(t_stmp)
+            super(Models.RunningAvgFit, self).update(t_stmp)
             #also ignore the first 0
             # last -n elements stops at first element if it's out of bounds
 
@@ -104,25 +106,25 @@ class Models:
     class BinaryLinearFit(BaseModel):
     
         def __init__(self,offset):
-                super().__init__(offset)
+                super(BinaryLinearFit, self).__init__(offset)
 
     class MultiLinearFit(BaseModel):
     
         def __init__(self,offset):
-            super().__init__(offset)
+            super(MultiLinearFit, self).__init__(offset)
 
     # Like this one
     class WindowsOfN(BaseModel):
     
         def __init__(self,offset):
-            super().__init__(offset)
+            super(WindowsOfN, self).__init__(offset)
 
     class SecondOrderFit(BaseModel):
     
         def __init__(self,offset):
-            super().__init__(offset)
+            super(SecondOrderFit, self).__init__(offset)
 
     class KalmanFilter(BaseModel):
     
         def __init__(self,offset):
-            super().__init__(offset)
+            super(KalmanFilter, self).__init__(offset)

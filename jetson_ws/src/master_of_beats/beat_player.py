@@ -2,7 +2,7 @@
 
 import csv, sys, time
 import rospy
-import pygame #, ppygame.midi as midi
+#import pygame #, ppygame.midi as midi
 #from playsound import playsound
 from std_msgs.msg import Bool
 from beat_msgs.msg import Beat
@@ -15,12 +15,15 @@ class Player(object):
     NODE_RATE=100
     LIVE=1
     OFF=0
-    def __init__(self,mode, predictive):
+    
+    def __init__(self,mode, predictive, lvl):
         #pygame.init()
         #self.s = pygame.mixer.Sound(Player.kick)
-        rospy.init_node('beat_player_node', log_level=rospy.INFO, anonymous=True)
-
+       
+        rospy.init_node('beat_player_node', log_level=lvl, anonymous=True)
         self.lag_adjustment=0.25 #for HW compensation
+        self.ahead=2
+        
         if predictive:
             #offset with cur. time
             self.model=Models.RunningAvgFit(rospy.Time.now().to_sec())
@@ -58,9 +61,12 @@ class Player(object):
         #playsound(self.note) # this has dep issues
         t_stmp=data.header.stamp.to_sec() #for now, let's find a sound module.
         self.model.update(t_stmp)
-        print("---------------")
-        rospy.logdebug("this :", t_stmp)
-        rospy.logdebug("next :", self.model.predict(1)[0])
+        pred=self.model.predict(1)#self.ahead
+        
+        rospy.logdebug("--------------------")
+        rospy.logdebug("rcv.:   pred: ")
+        rospy.logdebug(t_stmp)
+        rospy.logdebug( pred[0])
 
     def play(self):
         #print('beep', t_stmp-self.beats[-1])
@@ -82,6 +88,7 @@ class Player(object):
 
         T=1/Player.NODE_RATE #1/f, Period
         i=0
+        print('T',T)
 
         # Offline assumes timer starts from 0
         # Live uses the timer marks coming from ros
@@ -94,35 +101,41 @@ class Player(object):
                 if abs(elapsed-self.beats[i]) < T: #if we are in the correct t with a resolution of 1/rate
                     #self.play()
                     self.thump_pub.publish(True)
-                    #print(elapsed, elapsed-self.beats[i])
+                    print(elapsed, elapsed-self.beats[i])
                     i+=1
                 elif elapsed-self.beats[i] > T: #if running behind
                     i+=1
 
             self.rate.sleep()
     def run_predicted(self):
-        i=0
-        T=1/Player.NODE_RATE #1/f, Period
+        i=self.ahead
+        T=1.0/Player.NODE_RATE #1/f, Period
         #rhthym_model=Model()
-
+        print('T',T)
         # Offline assumes timer starts from 0
         # Live uses the timer marks coming from ros
         mark = (rospy.Time.now().to_sec() if not self.mode else 0)
 
         while not rospy.is_shutdown():
             if i < len(self.model.predictions):
-                elapsed=rospy.Time.now().to_sec() - mark
-                if abs(elapsed-self.model.predictions[i]) < T: #if we are in the correct t with a resolution of 1/rate
+                diff=rospy.Time.now().to_sec() - mark -self.model.predictions[i]
+
+                #print('p:', self.model.predictions[i], 't:' , elapsed)
+                if abs(diff) < T: #if we are in the correct t with a resolution of 1/rate
                     #self.play()
                     # - self.lag_adjustment !
                     self.thump_pub.publish(True)
-                    rospy.logdebug("Fired at:", elapsed, ". Was off ",  elapsed-self.model.predictions[i])
+                    rospy.logdebug("Fired with: ", diff, " s difference")
                     i+=1
-
-            self.rate.sleep()
+                elif self.model.predictions[i] > T: #if running behind
+                    i+=1
 
 if __name__ == '__main__':
     try:
+        if len(sys.argv) > 3 and sys.argv[3]:
+            lvl = rospy.DEBUG
+        else: lvl = rospy.INFO
+        
         if len(sys.argv)>2:
             mode = sys.argv[1]
             pred = sys.argv[2]
@@ -131,7 +144,7 @@ if __name__ == '__main__':
             pred = 0
         else:
             mode,pred = "off", 0
-        player = Player(mode,pred)
+        player = Player(mode, pred, lvl)
         player.run()
     except rospy.ROSInterruptException: pass
 else:

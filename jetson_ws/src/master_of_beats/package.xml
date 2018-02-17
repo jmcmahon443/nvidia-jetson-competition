@@ -16,7 +16,7 @@
   <build_export_depend>rospy</build_export_depend>
 
   <exec_depend>rospy</exec_depend>
-  <exec_depend>pygame</exec_depend>
+
   <exec_depend>python-numpy</exec_depend>
 
   <depend>beat_msgs</depend>
