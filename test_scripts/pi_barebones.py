@@ -28,4 +28,4 @@ if __name__ == '__main__':
 
     while (1):
         key = raw_input()
-        thump():
+        thump()
