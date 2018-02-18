@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #import Adafruit_MotorHAT, Adafruit_DCMotor, Adafruit_Stepper
+import sys, atexit, time
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor, Adafruit_StepperMotor
 
 def turnOffMotors():
@@ -12,9 +13,10 @@ def turnOffMotors():
 #myStepper.setSpeed(30)           # 30 RPM
 def thump():
     myStepper.setSpeed(254) # speed  in range (0,255)
-    myStepper.step(30, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.DOUBLE)
-    myStepper.setSpeed(100)
-    myStepper.step(30, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.DOUBLE)
+    myStepper.step(100, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.DOUBLE)
+    time.sleep(2)
+    myStepper.setSpeed(250)
+    myStepper.step(100, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.DOUBLE)
 
 
 
@@ -24,7 +26,7 @@ if __name__ == '__main__':
     mh = Adafruit_MotorHAT()
     atexit.register(turnOffMotors) # rospy.on_shutdown(turnOffMotors)
 
-    myStepper = mh.getStepper(200, 2)
+    myStepper = mh.getStepper(200, int(sys.argv[1]))
 
     while (1):
         key = raw_input()
