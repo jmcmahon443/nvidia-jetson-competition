@@ -14,8 +14,8 @@ class StepperHat(object):
     DIRS=[Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.FORWARD] #backwards is towrad the drum
     HIT_ZONE = -8  # where drum is
     TAP_LINE = 0  # rreturn here if you hve more beats to hit
-    RETREAT = 10 # as far back as we go
-    HIT_SPEED = 250
+    RETREAT = 6 # as far back as we go
+    HIT_SPEED = 180
     RETREAT_SPEED = 100
     
     
@@ -24,9 +24,9 @@ class StepperHat(object):
          self.mh = Adafruit_MotorHAT()
          self.stepper = self.mh.getStepper(revstep, 1)
          #self.dir_sel = 0 #driection select
-         self.dir_sel=-1
+         self.dir_sel=1
          self.coming_beats = 0
-         self.position = 0 #net count of taken steps  
+         self.position = -8 #net count of taken steps  
          
     # recommended for auto-disabling motors on shutdown!
     def turnOffMotors(self):
@@ -38,7 +38,7 @@ class StepperHat(object):
    
 #stepper's callback
     def thump(self, data):
-        if self.position> StepperHat.TAP_LINE:
+        if self.position > StepperHat.TAP_LINE:
             self.stepper.setSpeed(StepperHat.HIT_SPEED)
             self.dir_sel=0
         self.coming_beats += 1
@@ -60,6 +60,7 @@ class StepperHat(object):
                 self.coming_beats -= 1
             
             elif self.position >= StepperHat.TAP_LINE and self.coming_beats:  # and self.coming_beats>0: #already checking that
+
                 self.stepper.setSpeed(StepperHat.HIT_SPEED)
                 self.dir_sel=0
             
@@ -68,6 +69,7 @@ class StepperHat(object):
             
             print(self.position, self.dir_sel, self.coming_beats)
             return self.dir_sel
+
 
     # OPTION 2:
     # switch state on callback, count steps on main loop and roll back however many we got in
@@ -98,6 +100,7 @@ def main(inp,out):
         run=run_print
             
             
+
     if inp:
         thump_sub = rospy.Subscriber('/thumps', Bool, hat.cb)
     else:

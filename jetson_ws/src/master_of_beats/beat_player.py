@@ -21,12 +21,12 @@ class Player(object):
         #self.s = pygame.mixer.Sound(Player.kick)
 
         rospy.init_node('beat_player_node', log_level=lvl, anonymous=True)
-        self.lag_adjustment=0.25 #for HW compensation
+        self.lag_adjustment=0.1 #for HW compensation
         self.ahead=2
 
         if predictive:
             #offset with cur. time
-            self.model=Models.RunningAvgFit(rospy.Time.now().to_sec())
+            self.model=Models.RunningAvgFit(rospy.Time.now().to_sec(), 20)
             self.run=self.run_predicted
             self.cb=self.model_cb
         else:
@@ -42,7 +42,8 @@ class Player(object):
             self.mode=Player.OFF
             rospy.loginfo("Playing form file")
             beatfile=self.loadfile()
-            self.beats=[float(tstamp) for tstamp in beatfile.readlines()]
+            self.beats=[float(tstamp)
+ for tstamp in beatfile.readlines()]
             # for multicloumn
             # csv.reader(beats)
         else:
@@ -61,6 +62,7 @@ class Player(object):
         #playsound(self.note) # this has dep issues
         t_stmp=data.header.stamp.to_sec() #for now, let's find a sound module.
         self.model.update(t_stmp)
+
         pred=self.model.predict(1)#self.ahead
 
         rospy.logdebug("--------------------")
@@ -77,6 +79,7 @@ class Player(object):
     def loadfile(self):
         try:
             path=input('Beat file:')
+
 
         except SyntaxError:
             path = 'txt/test.txt'
@@ -108,7 +111,7 @@ class Player(object):
 
             self.rate.sleep()
     def run_predicted(self):
-        i=self.ahead
+        
         T=1.0/Player.NODE_RATE #1/f, Period
         #rhthym_model=Model()
         print('T',T)
@@ -117,18 +120,19 @@ class Player(object):
         mark = (rospy.Time.now().to_sec() if not self.mode else 0)
 
         while not rospy.is_shutdown():
-            if i < len(self.model.predictions):
-                diff=rospy.Time.now().to_sec() - mark -self.model.predictions[i]
+            if self.model.idx < len(self.model.predictions):
+                diff=rospy.Time.now().to_sec() - mark -self.model.predictions[self.model.idx] + self.lag_adjustment
                 #print(diff)
                 #print('p:', self.model.predictions[i], 't:' , elapsed)
                 if abs(diff) < T: #if we are in the correct t with a resolution of 1/rate
                     #self.play()
                     # - self.lag_adjustment !
                     self.thump_pub.publish(True)
+                    print(60//self.model.m_n, " bpm" )
                     #rospy.logdebug("Fired with: ", diff, " s difference")
-                    i+=1
+                    self.model.idx+=1
                 elif diff > T: #if running behind
-                    i+=1
+                    self.model.idx+=1
 
 if __name__ == '__main__':
     try:

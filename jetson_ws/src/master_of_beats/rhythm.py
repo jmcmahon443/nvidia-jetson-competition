@@ -9,12 +9,12 @@ class Models:
     # TODO: add Constans for method indexes and create an array of methods
 
     class BaseModel(object):
-        def __init__(self, offset):
+        def __init__(self, offset=0):
             self.observations=[offset] # beats, sohuld we move that out
             self.steps = [] # intervals between beats
             self.predictions=[offset]
             self.erros=[] # observations(t) - predictions(t)
-            self.index=0
+            self.idx=0
 
             self.offset=0
             self.bpm=60 # Not used
@@ -31,19 +31,20 @@ class Models:
 
         # gets n new predictions, appends them, and returns the new ones
         def predict(self,n):
-            last=self.observations[-1]
-            next_step=self.fit_fun(1)
-            #print("next_step: ", next_step)
-            #print("prev. steps: ", self.steps[-10:])
-            current_predictions = [(self.fit_fun(i) + last) for i in range(1,n+1)]
-            self.predictions.extend(current_predictions)
+            return self.repredict(n, self.idx)
+       #     last=self.observations[self.idx-1]
+       #     next_step=self.fit_fun(1)
+       #     #print("next_step: ", next_step)
+       #     #print("prev.steps: ", self.steps[-10:])
+       #     current_predictions = [(self.fit_fun(i) + last) for i in range(1,n+1)]
+       #     self.predictions.extend(current_predictions)
             #print(current_predictions)
-            return current_predictions
+      #      return current_predictions
 
         # when we want to update n predictions starting from after existing index i
         def repredict(self, n, idx):
             current_predictions = []
-            last=self.observations[-1]
+            last=self.observations[idx-1]
 
             for i in range(1,n+1):
                 pred=self.fit_fun(i) + self.observations[idx]
@@ -52,6 +53,7 @@ class Models:
                     self.predictions[i] = pred
                 else:
                     self.predictions.append(pred)
+
 
             return current_predictions
 
@@ -67,6 +69,7 @@ class Models:
     class AvgFit(BaseModel):
     
         def __init__(self,offset):
+
             # f=mx+p
             super(AvgFit, self).__init__(offset)
             self.m=0
@@ -83,11 +86,11 @@ class Models:
 
     class RunningAvgFit(BaseModel):
     
-        def __init__(self,offset):
+        def __init__(self,offset, window):
             # f=mx+p
             super(Models.RunningAvgFit, self).__init__(offset)
             self.m_n=0 #running average
-            self.n=10 # window size for avg
+            self.n=window # window size for avg
             
         def update(self,t_stmp):
             super(Models.RunningAvgFit, self).update(t_stmp)
@@ -117,6 +120,10 @@ class Models:
     class WindowsOfN(BaseModel):
     
         def __init__(self,offset):
+            self.winsize=1
+            self.N=[]
+         
+            rearrange
             super(WindowsOfN, self).__init__(offset)
 
     class SecondOrderFit(BaseModel):
