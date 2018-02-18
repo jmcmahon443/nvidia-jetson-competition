@@ -9,7 +9,7 @@ from std_msgs.msg import Bool
 from beat_msgs.msg import Beat
 
 class StepperHat(object):
-    
+
     def __init__(self):
          self.mh = Adafruit_MotorHAT()
          self.stepper = self.mh.getStepper(200, 2)
@@ -25,11 +25,11 @@ class StepperHat(object):
         self.stepper.step(30, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.DOUBLE)
     def bck(self,spd):
         self.stepper.setSpeed(spd)
-        self.stepper.step(30, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.DOUBLE)   
+        self.stepper.step(30, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.DOUBLE)
 
 #stepper.setSpeed(30)           # 30 RPM
     def thump(self, data):
-        
+
         self.fwd(254)
         self.bck(254)
 
@@ -38,8 +38,9 @@ class StepperHat(object):
     def noise(self, data):
         print(rospy.Time.now())
 
+
 def main(inp,out):
-    
+
     rospy.init_node('beat_player_node', log_level=rospy.INFO, anonymous=True)
     rate = rospy.Rate(100)
     # create a default object, no changes to I2C address or frequency
@@ -48,9 +49,6 @@ def main(inp,out):
         rospy.on_shutdown(hat.turnOffMotors) # atexit.register(turnOffMotors)
         hat.cb= hat.thump
     else: hat.cb = hat.noise
-        
-
-
 
     # 200 steps/rev, motor port #1
 
@@ -60,17 +58,15 @@ def main(inp,out):
         #directly from beat detector, mostly for testing
         beat_sub = rospy.Subscriber('/beats', Beat, hat.cb)
 
-
-  
-
     while not rospy.is_shutdown():
+        oneStep(self, dir, style)
         rate.sleep()
 
 
 
 
 if __name__ == '__main__':
-    inp=(int(sys.argv[1]) if len(sys.argv) >1 else 1) #which topic  
-    out=(int(sys.argv[2]) if len(sys.argv) >2 else 1) #which output 
-    
+    inp=(int(sys.argv[1]) if len(sys.argv) >1 else 1) #which topic
+    out=(int(sys.argv[2]) if len(sys.argv) >2 else 1) #which output
+
     sys.exit(main(inp, out))s
