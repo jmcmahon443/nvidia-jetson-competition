@@ -1,5 +1,5 @@
-# nvidia-jetson-competition
-This is the software for the AI Bass Drum Pedal entry to the 2018 NVIDIA Jetson Developer Competition.
+# beats-by-jetson
+This is the software for the AI Bass Drum Pedal "Beats by Jetson" entry to the 2018 NVIDIA Jetson Developer Competition.
 
 ## Workstation installation
 1. Make sure Python is installed: `which python`.
