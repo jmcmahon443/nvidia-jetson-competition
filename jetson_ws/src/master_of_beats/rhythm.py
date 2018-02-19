@@ -67,7 +67,7 @@ class Models:
             pass
 
     class AvgFit(BaseModel):
-    
+
         def __init__(self,offset):
 
             # f=mx+p
@@ -85,13 +85,13 @@ class Models:
             return self.m*(i) #+self.observations[self.i]
 
     class RunningAvgFit(BaseModel):
-    
+
         def __init__(self,offset, window):
             # f=mx+p
             super(Models.RunningAvgFit, self).__init__(offset)
             self.m_n=0 #running average
             self.n=window # window size for avg
-            
+
         def update(self,t_stmp):
             super(Models.RunningAvgFit, self).update(t_stmp)
             #also ignore the first 0
@@ -107,31 +107,31 @@ class Models:
             self.n=n
 
     class BinaryLinearFit(BaseModel):
-    
+
         def __init__(self,offset):
                 super(BinaryLinearFit, self).__init__(offset)
 
     class MultiLinearFit(BaseModel):
-    
+
         def __init__(self,offset):
             super(MultiLinearFit, self).__init__(offset)
 
     # Like this one
     class WindowsOfN(BaseModel):
-    
+
         def __init__(self,offset):
             self.winsize=1
             self.N=[]
-         
-            rearrange
+
+            #rearrange
             super(WindowsOfN, self).__init__(offset)
 
     class SecondOrderFit(BaseModel):
-    
+
         def __init__(self,offset):
             super(SecondOrderFit, self).__init__(offset)
 
     class KalmanFilter(BaseModel):
-    
+
         def __init__(self,offset):
             super(KalmanFilter, self).__init__(offset)
