@@ -1,6 +1,13 @@
 # beats-by-jetson
 This is the software for the AI Bass Drum Pedal "Beats by Jetson" entry to the 2018 NVIDIA Jetson Developer Competition.
-
+cd into jetson_ws and catkin build. Source the workspace and then:
+```
+roscore
+python beat_makers/beat_detector.py (or keyboard2beats.py for manual input)
+python beat_makers/beat_detector.py live 1 
+python beat_makers/whiplash.py 1 1 
+```
+Or use the provided .launch files.
 ## Workstation installation
 1. Make sure Python is installed: `which python`.
 2. Install DPKG packages `sudo apt-get install vim ffmpeg python-portaudio aubio`.
