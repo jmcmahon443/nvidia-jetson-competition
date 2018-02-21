@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>jetson_beats</name>
+  <version>0.1.0</version>
+  <description>
+    Mateapackage / launch file package for Beats by Jetson
+  </description>
+
+
+  <maintainer email="oakyildiz@wpi.edu">Ozan Akyildiz</maintainer>
+  <license>MIT</license>
+  <author email="oakyildiz@wpi.edu">Ozan Akyildiz</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>beat_makers</exec_depend>
+  <exec_depend>beat_players</exec_depend>
+  <exec_depend>master_of_beats</exec_depend>
+  <depend>beat_msgs</depend>
+
+  <export>
+    <!--<metapackage/>-->
+  </export>
+</package>

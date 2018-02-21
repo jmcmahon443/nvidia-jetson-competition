@@ -18,15 +18,18 @@ class BeatMaker(object):
     rate=10 #calcualte by win_size/sampling rate: 512/44100 ~ 11.6ms
     def __init__(self, lvl):
         #ros
-        rospy.init_node('beat_detector_node', log_level=lvl, anonymous=True)
-        self.mode = rospy.get_param('~source', 'live')
+        #name=rospy.get_param('~name', 'beat_detector_node')
+        #topic=rospy.get_param('~topic', 'beats')
 
-        self.beat_pub = rospy.Publisher('beats', Beat, queue_size=10)
+
+        rospy.init_node("detector" , log_level=lvl, anonymous=True)
+
+        self.beat_pub = rospy.Publisher("out", Beat, queue_size=10)
         # and use the implemented Models array here
 
 
 
-    def audio_init(self, filename, samplerate, win_s, hop_s):
+    def audio_init(self, source, samplerate, win_s, hop_s):
         #pyaudio init.
         self.audio = pyaudio.PyAudio()
         self.audio_format = pyaudio.paFloat32
@@ -40,7 +43,7 @@ class BeatMaker(object):
         self.msg.beat=True
 
         # select aubio source
-        if (filename == "live"): # or source
+        if (source == "live"): # or source
             print("Tapping to the live input")
             self.mode=BeatMaker.LIVE
             samplerate=RATE
@@ -53,7 +56,7 @@ class BeatMaker(object):
         else:
             print("Tapping to the audio file")
             self.mode=BeatMaker.OFFLINE
-            self.source = aubio.source(filename, samplerate, hop_s)
+            self.source = aubio.source(source, samplerate, hop_s)
             samplerate = self.source.samplerate
             self.btempo = aubio.tempo("default", win_s, hop_s, samplerate)
 
@@ -110,31 +113,37 @@ class BeatMaker(object):
 
 def parse():
 
+    source = rospy.get_param('source', 'live')
+    samplerate = int(rospy.get_param('rate', '44100'))
 
-    if len(sys.argv) < 2:
-      return "live", 0
+    # if len(sys.argv) < 2:
+    #   return source, samplerate
+    # print(sys.argv)
+    #
+    # source = sys.argv[1]
+    #
+    #
+    # if len(sys.argv) > 2: samplerate = int(sys.argv[2])
 
-
-    filename = sys.argv[1]
-    samplerate = 0
-
-    if len(sys.argv) > 2: samplerate = int(sys.argv[2])
-
-    return filename, samplerate
+    return source, samplerate
 
 
 if __name__ == '__main__':
     try:
-        if len(sys.argv) > 3 and sys.argv[3]:
-            lvl = rospy.DEBUG
-        else: lvl = rospy.INFO
+        # Apeerantly roslaunch prepends it's own argv[i]s, so lets ditch trying to read both
 
-        file_name, sample_rate = parse()
+        # if len(sys.argv) > 3 and sys.argv[3]:
+        #     lvl = rospy.DEBUG
+        # else:
+        lvl = rospy.get_param('log_level', rospy.INFO)
+
         win_s = 1024                # fft size
         hop_s = win_s // 2
 
         bmk = BeatMaker(lvl)
-        bmk.audio_init(file_name, sample_rate, win_s, hop_s)
+        source_, sample_rate = parse()
+
+        bmk.audio_init(source_, sample_rate, win_s, hop_s)
         bmk.run()
 
     except rospy.ROSInterruptException: pass

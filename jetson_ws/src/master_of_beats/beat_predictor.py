@@ -9,18 +9,19 @@ from beat_msgs.msg import Beat
 
 from rhythm import Models
 
-
 class Player(object):
     KICK='res/kick.mp3'
     NODE_RATE=100
     LIVE=1
     OFF=0
 
-    def __init__(self,mode, predictive, lvl):
+    def __init__(self,mode, predictive):
         #pygame.init()
         #self.s = pygame.mixer.Sound(Player.kick)
+        #name=rospy.get_param('name', 'beat_prediction_node')
+        #in_topic=rospy.get_param('~in', 'beats')
+        #out_topic=rospy.get_param('~out', 'thumps')
 
-        rospy.init_node('beat_player_node', log_level=lvl, anonymous=True)
         self.lag_adjustment=0.1 #for HW compensation
         self.ahead=2
 
@@ -35,7 +36,7 @@ class Player(object):
             self.beats=[0]
          #add the actuator delay here, subtract it for comparison
 
-        self.thump_pub = rospy.Publisher('thumps', Bool, queue_size=10)
+        self.thump_pub = rospy.Publisher("out", Bool, queue_size=10)
         self.rate = rospy.Rate(Player.NODE_RATE) # 10 Hz
 
         if 'playback' in mode or 'off' in mode:
@@ -49,7 +50,7 @@ class Player(object):
         else:
             self.mode=Player.LIVE
             rospy.loginfo("Player is live")
-            self.beat_sub = rospy.Subscriber('beats', Beat, self.cb)
+            self.beat_sub = rospy.Subscriber("in", Beat, self.cb)
             #self.run=self.live
 
 
@@ -120,8 +121,8 @@ class Player(object):
         mark = (rospy.Time.now().to_sec() if not self.mode else 0)
 
         while not rospy.is_shutdown():
-            if self.model.idx < len(self.model.predictions):
-                diff=rospy.Time.now().to_sec() - mark -self.model.predictions[self.model.idx] + self.lag_adjustment
+            if self.model.idx < len(self.model.observations):
+                diff=rospy.Time.now().to_sec() - mark -self.model.current_pred() + self.lag_adjustment
                 #print(diff)
                 #print('p:', self.model.predictions[i], 't:' , elapsed)
                 if abs(diff) < T: #if we are in the correct t with a resolution of 1/rate
@@ -132,26 +133,32 @@ class Player(object):
                     #rospy.logdebug("Fired with: ", diff, " s difference")
                     self.model.idx+=1
                 elif diff > T: #if running behind
+                    #print("cur",self.model.current_pred())
                     self.model.idx+=1
 
 if __name__ == '__main__':
     try:
-        if len(sys.argv) > 3 and sys.argv[3]:
-            lvl = rospy.DEBUG
-        else: lvl = rospy.INFO
+        # Apeerantly roslaunch prepends it's own argv[i]s, so lets ditch trying to read both
 
-        if len(sys.argv)>2:
-            mode = sys.argv[1]
-            pred = sys.argv[2]
-        elif len(sys.argv)>1:
-            mode = sys.argv[1]
-            pred = 0
-        else:
-            mode,pred = "off", 0
-        player = Player(mode, pred, lvl)
+        # if len(sys.argv) > 3 and sys.argv[3]:
+        #     lvl = rospy.DEBUG
+        # else:
+        lvl = rospy.get_param('log_level', rospy.INFO)
+
+        # if len(sys.argv)>2:
+        #     mode = sys.argv[1]
+        #     pred = sys.argv[2]
+        # elif len(sys.argv)>1:
+        #     mode = sys.argv[1]
+        # else:
+        #
+        rospy.init_node("predictor" , log_level=lvl, anonymous=True)
+        mode = rospy.get_param('mode', 'live')
+        pred = rospy.get_param('prediction', True)
+
+        player = Player(mode, pred)
         player.run()
+
     except rospy.ROSInterruptException: pass
 else:
-    mode = rospy.get_param('~player_mode', 'live')
-    player = Player(mode)
-    player.run()
+    print("What are you doing? This is not a module!")

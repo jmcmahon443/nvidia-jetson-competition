@@ -11,23 +11,31 @@ class Models:
     class BaseModel(object):
         def __init__(self, offset=0):
             self.observations=[offset] # beats, sohuld we move that out
-            self.steps = [] # intervals between beats
-            self.predictions=[offset]
-            self.erros=[] # observations(t) - predictions(t)
-            self.idx=0
+            self.steps = [0] # intervals between beats
+            self.predictions=[-1 ,-1]
+            self.errors=[0] # observations(t) - predictions(t)
+            self.idx=1
 
             self.offset=0
             self.bpm=60 # Not used
             self.confidence=1
 
             #self.window (window of interest)
+        def current_pred(self):
+            return self.predictions[self.idx]
+
         def adjust(self, t):
             self.offset+=t
 
         def update(self,t_stmp):
-
-            self.steps.append(t_stmp-self.observations[-1]) #this way first one is always 0
+            print(self.idx)
+            last_i=self.idx-1
+            self.steps.append(t_stmp-self.observations[last_i]) #this way first one is always 0
             self.observations.append(t_stmp)
+            self.calc_err(last_i)
+            self.errors.append(self.calc_err(last_i))
+            print(self.errors[-1])
+            print(self.steps[-1])
 
         # gets n new predictions, appends them, and returns the new ones
         def predict(self,n):
@@ -39,7 +47,7 @@ class Models:
        #     current_predictions = [(self.fit_fun(i) + last) for i in range(1,n+1)]
        #     self.predictions.extend(current_predictions)
             #print(current_predictions)
-      #      return current_predictions
+       #     return current_predictions
 
         # when we want to update n predictions starting from after existing index i
         def repredict(self, n, idx):
@@ -47,28 +55,29 @@ class Models:
             last=self.observations[idx-1]
 
             for i in range(1,n+1):
-                pred=self.fit_fun(i) + self.observations[idx]
+                pred=self.fit_fun(i) + last
                 current_predictions.append(pred)
                 if idx+i < len(self.predictions):
                     self.predictions[i] = pred
                 else:
                     self.predictions.append(pred)
 
+            #print(self.predictions)
 
             return current_predictions
 
-        def calc_errors(self):
-            pass # index aligning should happen first,
-                 # and that needs more code shaped out
+        def calc_err(self,i):
+            #last=self.idx-1
+            #self.errors.append(self.observations[last]-self.predictions[last])
 
+            return self.observations[i]-self.predictions[i]
 
         # should be defined by the inheritng class
         def fit_fun(self,i): #lambda?
             pass
 
-        def eval(self):
-
-        def eval_last(self):
+        def eval(self): #some statistics stuff
+            pass
 
     class AvgFit(BaseModel):
 
@@ -124,7 +133,7 @@ class Models:
     class WindowsOfN(BaseModel):
 
         def __init__(self,offset):
-            self.winsize=1
+            self.l=1 # windows size
             self.T = 0 #time
             self.N=[]
             #rearrange
@@ -142,11 +151,13 @@ class Models:
         def fit_fun(self,i):
             #constant part currently comes from the selected index of beats
 
-            return self.N[i%]*(i//N+1)  #+self.observations[self.i
+            return self.N[i%l]*(i//N+1)  #+self.observations[self.i
 
-        def eval_window(self)
+        def eval_window(self):
+            pass
 
-        def adjust_window
+        def adjust_window(self):
+            pass
 
         def set_window(self,n):
             self.N=n

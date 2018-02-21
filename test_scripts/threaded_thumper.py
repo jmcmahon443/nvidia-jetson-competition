@@ -12,7 +12,6 @@ mh = Adafruit_MotorHAT()
 st1 = threading.Thread()
 
 
-
 # recommended for auto-disabling motors on shutdown!
 def turnOffMotors():
     mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
@@ -26,8 +25,6 @@ myStepper1 = mh.getStepper(200, 1)      # 200 steps/rev, 1.8 deg/step motor port
 
 spd=300
         # 30 RPM
-
-
 
 
 

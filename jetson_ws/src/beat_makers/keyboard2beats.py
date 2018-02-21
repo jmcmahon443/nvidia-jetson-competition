@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import sys
 from rospy import init_node, is_shutdown, Time, Publisher
 from beat_msgs.msg import Beat
 
@@ -14,6 +14,12 @@ if __name__ == '__main__':
     print("Tap ENTER with beats") # press x to break")
 
     while not is_shutdown():
-        key = raw_input()
-        a_beat.mark=Time.now()
-        beat_pub.publish(a_beat)
+        try:
+            key = raw_input()
+            a_beat.mark=Time.now()
+            beat_pub.publish(a_beat)
+        except KeyboardInterrupt:
+        raise
+
+
+    sys.exit()

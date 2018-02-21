@@ -1,0 +1,27 @@
+
+<!-- Launch file for the complete software stack of Beats by Jetson.-->
+<!-- Defaults are set to full live functionality. -->
+<launch>
+  <arg name="with_i2c" default="true" />
+  <param name="log_level" type="int" value ="2"/> <!--rospy.INFO-->
+<!-- args="argv1,argv2" is also possible -->
+  <node name="detector" pkg="beat_makers" type="beat_detector.py" output="screen">
+    <param name="source" value="live" />
+    <remap from="out" to="beats" />
+
+  </node>
+
+  <node name="predictor" pkg="master_of_beats" type="beat_predictor.py" output="screen">
+    <remap from="in" to="beats" />
+    <remap from="out" to="thumps" />
+    <param name="mode" value="live" />
+    <param name="prediction"  type="bool" value="true" />
+
+  </node>
+
+  <node name="bass_drum" pkg="drummer" type="whiplash.py" output="screen">
+    <remap from="in" to="/thumps" />
+    <param name="out"  type="bool" value="$(arg with_i2c)" />
+  </node>
+
+</launch>
