@@ -15,6 +15,8 @@ class Models:
             self.predictions=[offset]
             self.erros=[] # observations(t) - predictions(t)
             self.idx=0
+            
+            self._filling= True 
 
             self.offset=0
             self.bpm=60 # Not used
@@ -124,21 +126,27 @@ class Models:
     class WindowsOfN(BaseModel):
 
         def __init__(self,offset):
+            super(WindowsOfN, self).__init__(offset)
             self.winsize=1
-            self.T = 0 #time
-            self.N=[]
+            self.T = 0
+            self.N=[0]
+            self.hist=10 #history of beats
             #rearrange
 
-            super(WindowsOfN, self).__init__(offset)
 
 
         def update(self,t_stmp):
             super(Models.WindowsOfN, self).update(t_stmp)
-            N[:]
-
+            T=self.index - self.index%i #time
+            folded=np.array(self.beats[T-self.winsize*self.hist:T+1]).reshape(self.winsize, self.hist)
+            self.N=np.mean(folded , axis=1) # should i jsut pop and push? TODO: fill with -1's until we got enpough data
+            
+            #TODO: increase/decrease window. Error method
+            
             #also ignore the first 0
             # last -n elements stops at first element if it's out of bounds
 
+            
         def fit_fun(self,i):
             #constant part currently comes from the selected index of beats
 
