@@ -62,7 +62,7 @@ class BeatMaker(object):
                         stream_callback=self.file_callback)
             self.click = 0.7 * np.sin(2. * np.pi * np.arange(hop_s) / hop_s * samplerate / 3000.)
         # create aubio tempo detection
-        
+
         # create a simple click sound
 
 
@@ -78,7 +78,7 @@ class BeatMaker(object):
 
     def pub(self):
          # is assigning a member field and just updating stamp faster?
-        self.msg.header.stamp=rospy.Time.now()
+        self.msg.mark=rospy.Time.now()
         self.beat_pub.publish(self.msg)
 
 
@@ -124,11 +124,11 @@ def parse():
 
 
 if __name__ == '__main__':
-    try:    
+    try:
         if len(sys.argv) > 3 and sys.argv[3]:
             lvl = rospy.DEBUG
         else: lvl = rospy.INFO
-        
+
         file_name, sample_rate = parse()
         win_s = 1024                # fft size
         hop_s = win_s // 2
@@ -138,5 +138,3 @@ if __name__ == '__main__':
         bmk.run()
 
     except rospy.ROSInterruptException: pass
-
-

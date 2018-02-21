@@ -66,6 +66,10 @@ class Models:
         def fit_fun(self,i): #lambda?
             pass
 
+        def eval(self):
+
+        def eval_last(self):
+
     class AvgFit(BaseModel):
 
         def __init__(self,offset):
@@ -121,10 +125,31 @@ class Models:
 
         def __init__(self,offset):
             self.winsize=1
+            self.T = 0 #time
             self.N=[]
-
             #rearrange
+
             super(WindowsOfN, self).__init__(offset)
+
+
+        def update(self,t_stmp):
+            super(Models.WindowsOfN, self).update(t_stmp)
+            N[:]
+
+            #also ignore the first 0
+            # last -n elements stops at first element if it's out of bounds
+
+        def fit_fun(self,i):
+            #constant part currently comes from the selected index of beats
+
+            return self.N[i%]*(i//N+1)  #+self.observations[self.i
+
+        def eval_window(self)
+
+        def adjust_window
+
+        def set_window(self,n):
+            self.N=n
 
     class SecondOrderFit(BaseModel):
 

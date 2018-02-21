@@ -15,5 +15,5 @@ if __name__ == '__main__':
 
     while not is_shutdown():
         key = raw_input()
-        a_beat.header.stamp=Time.now()
+        a_beat.mark=Time.now()
         beat_pub.publish(a_beat)

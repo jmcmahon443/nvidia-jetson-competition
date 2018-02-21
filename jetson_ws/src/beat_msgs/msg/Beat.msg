@@ -1,4 +1,4 @@
 #message containing  the beat info
 
-Header header
+time mark
 bool beat

@@ -29,6 +29,8 @@ spd=300
 
 
 
+
+
 stepstyles = [Adafruit_MotorHAT.SINGLE, Adafruit_MotorHAT.DOUBLE, Adafruit_MotorHAT.INTERLEAVE, Adafruit_MotorHAT.MICROSTEP] # https://en.wikipedia.org/wiki/Stepper_motor#Phase_urent_waveforms
 
 def stepper_worker(stepper, numsteps, direction, style):
@@ -38,21 +40,21 @@ def stepper_worker(stepper, numsteps, direction, style):
 
 dir_toggle=0
 while (True):
-    myStepper1.setSpeed(spd) 
-    print("speed", spd) 
+    myStepper1.setSpeed(spd)
+    print("speed", spd)
     if not st1.isAlive():
-        dir_toggle ^=1 
+        dir_toggle ^=1
         print("Stepper 1"),
         if ( dir_toggle ):
             dir = Adafruit_MotorHAT.BACKWARD
             print("backward")
-            
-            
+
+
         steps=(10)
         print("%d steps" % steps)
         st1 = threading.Thread(target=stepper_worker, args=(myStepper1, steps, dir, Adafruit_MotorHAT.DOUBLE))
         st1.start()
         spd+=10
 
-    
+
     time.sleep(0.1)

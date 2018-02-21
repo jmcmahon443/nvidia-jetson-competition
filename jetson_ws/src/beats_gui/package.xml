@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>beat_gui</name>
+  <name>beats_gui</name>
   <version>0.1.0</version>
-  <description>The beat_msgs package</description>
+  <description>Visualization node for Beeats by Jetson</description>
 
   <maintainer email="oakyildiz@wpi.edu">Ozan Akyildiz</maintainer>
   <license>MIT</license>
@@ -11,10 +11,10 @@
 
 <!-- Use build_export_depend for packages you need in order to build against this package: -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_export_depend>rospy</build_export_depend>
+  <build_depend>roscpp</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
 
-  <exec_depend>rospy</exec_depend>
+  <exec_depend>roscpp</exec_depend>
 
 
   <depend>std_msgs</depend>

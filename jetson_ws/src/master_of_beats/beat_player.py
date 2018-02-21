@@ -55,12 +55,12 @@ class Player(object):
 
     def beat_cb(self,data):
         #playsound(self.note) # this has dep issues
-        t_stmp=data.header.stamp.to_sec() #for now, let's find a sound module.
+        t_stmp=data.mark.to_sec() #for now, let's find a sound module.
         self.beats.append(t_stmp)
 
     def model_cb(self,data):
         #playsound(self.note) # this has dep issues
-        t_stmp=data.header.stamp.to_sec() #for now, let's find a sound module.
+        t_stmp=data.mark.to_sec() #for now, let's find a sound module.
         self.model.update(t_stmp)
 
         pred=self.model.predict(1)#self.ahead
@@ -111,7 +111,7 @@ class Player(object):
 
             self.rate.sleep()
     def run_predicted(self):
-        
+
         T=1.0/Player.NODE_RATE #1/f, Period
         #rhthym_model=Model()
         print('T',T)
