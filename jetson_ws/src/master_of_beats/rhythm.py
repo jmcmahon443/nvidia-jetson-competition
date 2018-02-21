@@ -133,21 +133,26 @@ class Models:
     class WindowsOfN(BaseModel):
 
         def __init__(self,offset):
+            super(WindowsOfN, self).__init__(offset)
             self.l=1 # windows size
             self.T = 0 #time
-            self.N=[]
+            self.N=[0]
+            self.hist=10 #history of beats
             #rearrange
-
-            super(WindowsOfN, self).__init__(offset)
 
 
         def update(self,t_stmp):
             super(Models.WindowsOfN, self).update(t_stmp)
-            N[:]
-
+            T=self.index - self.index%i #time
+            folded=np.array(self.beats[T-self.winsize*self.hist:T+1]).reshape(self.winsize, self.hist)
+            self.N=np.mean(folded , axis=1) # should i jsut pop and push? TODO: fill with -1's until we got enpough data
+            
+            #TODO: increase/decrease window. Error method
+            
             #also ignore the first 0
             # last -n elements stops at first element if it's out of bounds
 
+            
         def fit_fun(self,i):
             #constant part currently comes from the selected index of beats
 

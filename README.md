@@ -4,7 +4,7 @@ cd into jetson_ws and catkin build. Source the workspace and then:
 ```
 roscore
 python beat_makers/beat_detector.py (or keyboard2beats.py for manual input)
-python master_of_beat/beat_predictor.py live 1 
+python master_of_beats/beat_predictor.py live 1 
 python beat_players/drummer/whiplash.py 1 1 
 ```
 Or use the provided .launch files.
