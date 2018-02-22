@@ -7,7 +7,7 @@ import rospy
 from std_msgs.msg import Bool
 from beat_msgs.msg import Beat
 
-from rhythm import Models
+from rhythm import models
 
 class Player(object):
     KICK='res/kick.mp3'
@@ -27,7 +27,7 @@ class Player(object):
 
         if predictive:
             #offset with cur. time
-            self.model=Models.RunningAvgFit(rospy.Time.now().to_sec(), 20)
+            self.model=Models.Model(rospy.Time.now().to_sec(), 20)
             self.run=self.run_predicted
             self.cb=self.model_cb
         else:
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         #
         rospy.init_node("predictor" , log_level=lvl, anonymous=True)
         mode = rospy.get_param('mode', 'live')
-        pred = rospy.get_param('prediction', True)
+        pred = rospy.get_param('prediction', 1)
 
         player = Player(mode, pred)
         player.run()

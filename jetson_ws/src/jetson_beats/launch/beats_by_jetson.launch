@@ -3,6 +3,7 @@
 <!-- Defaults are set to full live functionality. -->
 <launch>
   <arg name="with_i2c" default="true" />
+  <arg name="prediction" default="0" />
   <param name="log_level" type="int" value ="2"/> <!--rospy.INFO-->
 <!-- args="argv1,argv2" is also possible -->
   <node name="detector" pkg="beat_makers" type="beat_detector.py" output="screen">
@@ -15,8 +16,7 @@
     <remap from="in" to="beats" />
     <remap from="out" to="thumps" />
     <param name="mode" value="live" />
-    <param name="prediction"  type="bool" value="true" />
-
+    <param name="prediction"  type="int" value="$(arg prediction)" />
   </node>
 
   <node name="bass_drum" pkg="drummer" type="whiplash.py" output="screen">

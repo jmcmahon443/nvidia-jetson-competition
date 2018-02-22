@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 import sys
 import numpy as np
+from collections import deque # performance improvement! everything is a dequeue
 
 
-
-class Models:
-    MODELS=[]
+class models: # namespace models
+    #MODELS=[self.RunningAvgFit, self.WindowsOfN, self.KalmanFilter]
     # TODO: add Constans for method indexes and create an array of methods
 
     class BaseModel(object):
-        def __init__(self, offset=0):
+        def __init__(self, offset=0, window=5):
             self.observations=[offset] # beats, sohuld we move that out
             self.steps = [0] # intervals between beats
             self.predictions=[-1 ,-1]
             self.errors=[0] # observations(t) - predictions(t)
             self.idx=1
 
+            self.W=window
             self.offset=0
             self.bpm=60 # Not used
             self.confidence=1
@@ -53,7 +54,6 @@ class Models:
         def repredict(self, n, idx):
             current_predictions = []
             last=self.observations[idx-1]
-
             for i in range(1,n+1):
                 pred=self.fit_fun(i) + last
                 current_predictions.append(pred)
@@ -63,7 +63,6 @@ class Models:
                     self.predictions.append(pred)
 
             #print(self.predictions)
-
             return current_predictions
 
         def calc_err(self,i):
@@ -81,10 +80,10 @@ class Models:
 
     class AvgFit(BaseModel):
 
-        def __init__(self,offset):
+        def __init__(self,offset, window):
 
             # f=mx+p
-            super(AvgFit, self).__init__(offset)
+            super(AvgFit, self).__init__(offset, window)
             self.m=0
 
         def update(self,t_stmp):
@@ -101,16 +100,20 @@ class Models:
 
         def __init__(self,offset, window):
             # f=mx+p
-            super(Models.RunningAvgFit, self).__init__(offset)
+            super(models.RunningAvgFit, self).__init__(offset, window)
             self.m_n=0 #running average
-            self.n=window # window size for avg
+            self.W=window # window size for avg
+            self.ROI=deque([],window)
+
 
         def update(self,t_stmp):
-            super(Models.RunningAvgFit, self).update(t_stmp)
+            super(models.RunningAvgFit, self).update(t_stmp)
+            self.ROI.append(self.steps[-1])
+
             #also ignore the first 0
             # last -n elements stops at first element if it's out of bounds
 
-            self.m_n = np.sum(self.steps[-self.n:])/self.n # should be faster than mean function
+            self.m_n = np.mean(self.ROI) # should be faster than mean function
 
         def fit_fun(self,i):
             #constant part currently comes from the selected index of beats
@@ -122,47 +125,71 @@ class Models:
     class BinaryLinearFit(BaseModel):
 
         def __init__(self,offset):
-                super(BinaryLinearFit, self).__init__(offset)
+                super(BinaryLinearFit, self).__init__(offset, window)
 
     class MultiLinearFit(BaseModel):
 
         def __init__(self,offset):
-            super(MultiLinearFit, self).__init__(offset)
+            super(MultiLinearFit, self).__init__(offset, window)
 
     # Like this one
     class WindowsOfN(BaseModel):
 
         def __init__(self,offset):
-            super(WindowsOfN, self).__init__(offset)
-            self.l=1 # windows size
+
+            super(WindowsOfN, self).__init__(offset, window=10)
+            self.L=1 # length of pattern
             self.T = 0 #time
-            self.N=[0]
-            self.hist=10 #history of beats
+            #W # hist.window size
             #rearrange
+            self.last_fit=0 #cheeky for loops
+            #self.ROI[index%i].append(t_stmp)
 
 
         def update(self,t_stmp):
-            super(Models.WindowsOfN, self).update(t_stmp)
-            T=self.index - self.index%i #time
-            folded=np.array(self.beats[T-self.winsize*self.hist:T+1]).reshape(self.winsize, self.hist)
-            self.N=np.mean(folded , axis=1) # should i jsut pop and push? TODO: fill with -1's until we got enpough data
-            
+
+            super(models.WindowsOfN, self).update(t_stmp)
+
+            mod=self.idx%self.L #time
+            #self.N=np.mean(folded , axis=1) # should i jsut pop and push? TODO: fill with -1's until we got enpough data
+
+            self.ROI[mod].append(self.steps[-1])
+            self.N[mod]=self.ROI[mod]
             #TODO: increase/decrease window. Error method
-            
+
             #also ignore the first 0
             # last -n elements stops at first element if it's out of bounds
 
-            
+
         def fit_fun(self,i):
             #constant part currently comes from the selected index of beats
+            #cheeky workaround with for loops
+            if i == 1:
+                self.last_fit=self.N[(self.idx+1)%self.L]  #+self.observations[self.i
+                #so, we reset everytime prediction is invoked anew
+            else:
+                self.last_fit= self.last_fit + self.N[(self.idx+i)%self.L]
 
-            return self.N[i%l]*(i//N+1)  #+self.observations[self.i
+            return self.last_fit
+
+
+
+        def shape_roi(self):
+            self.ROI=[deque([],self.W) for i in range(self.N)]
+
+        def fill_roi(self): #when we rehsape, we refill the ROI except for the first time
+            N=self.N
+            (self.ROI[i%N].append(self.steps[i]) for  i in range(self.idx-N*self.W,self.idx))
+
 
         def eval_window(self):
-            pass
+            if np.std(self.N)/np.mean(self.N):
+                pass
 
-        def adjust_window(self):
-            pass
+        def adjust_window(self,new_n):
+            self.N=new_n
+            self.shape_roi()
+            self.fill_roi()
 
         def set_window(self,n):
             self.N=n
@@ -170,9 +197,9 @@ class Models:
     class SecondOrderFit(BaseModel):
 
         def __init__(self,offset):
-            super(SecondOrderFit, self).__init__(offset)
+            super(SecondOrderFit, self).__init__(offset, window)
 
     class KalmanFilter(BaseModel):
 
         def __init__(self,offset):
-            super(KalmanFilter, self).__init__(offset)
+            super(KalmanFilter, self).__init__(offset, window)

@@ -3,9 +3,7 @@
   <name>master_of_beats</name>
   <version>0.2.0</version>
   <description>A MIDI player for playing received durm beats</description>
-  <maintainer email="oakyildiz@todo.todo">oakyildiz</maintainer>
-
-
+  <maintainer email="oakyildiz@wpi.edu">oakyildiz</maintainer>
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>MIT</license>
   <author email="oakyildiz@wpi.edu">Ozan Akyildiz</author>
