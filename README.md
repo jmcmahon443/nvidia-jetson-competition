@@ -19,7 +19,7 @@ Or use the provided .launch files.
 ## Jetson setup and installation
 1. Plug-in power, HDMI monitor, mouse and keyboard into Jetson. Hit the power button.
 2. Follow Nvidia's installation steps shown at boot and reboot to Ubuntu desktop.
-3. Connect to Wi-Fi (Sarmad's TK1 requires a Wi-Fi module and driver), or ethernet to router.
+3. Connect to Wi-Fi, or ethernet to router.
 4. Follow the directions for the stepper motor software, which is cloned at `output/nvidia-jetson-competition/output/Adafruit-Motor-HAT-Python-Library`: https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/installing-software
 
 
